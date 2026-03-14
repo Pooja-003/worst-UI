@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApplyNow™️ — Careers Made Simple</title>
+    <style>
+        /* ================================================
+           GLOBAL STYLES
+           ================================================ */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f4f6f9;
+            color: #001f3f;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 { font-family: 'Times New Roman', Times, serif; }
+        .swapped-font { font-family: 'Times New Roman', Times, serif; }
+        .swapped-font-heading { font-family: Arial, sans-serif; }
+
+        /* ================================================
+           HEADER
+           ================================================ */
+        header {
+            background-color: #001f3f;
+            color: white;
+            padding: 20px 20px 15px;
+            text-align: center;
+            border-bottom: 5px solid #0056b3;
+            position: relative;
+        }
+        header h1 { margin: 0 0 2px; font-size: 28px; }
+        header .tagline { font-size: 13px; opacity: 0.85; margin: 0 0 6px; }
+        .powered-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        nav { margin-top: 8px; }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        nav a:hover { text-decoration: underline; }
+
+        /* Session Timer */
+        .session-timer {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 11px;
+            color: #ff6b6b;
+            font-family: monospace;
+        }
+
+        /* ================================================
+           VIOLATION COUNTER (Sticky Badge)
+           ================================================ */
+        #violation-counter {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: #1a1a2e;
+            color: #ff4757;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 9999;
+            border: 2px solid #ff4757;
+            transition: transform 0.15s;
+            cursor: default;
+            box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+        }
+        #violation-counter.flash {
+            animation: vFlash 0.4s ease;
+        }
+        @keyframes vFlash {
+            0%   { transform: scale(1); background: #1a1a2e; }
+            50%  { transform: scale(1.25); background: #ff4757; color: white; }
+            100% { transform: scale(1); background: #1a1a2e; }
+        }
+
+        /* ================================================
+           MAIN CONTAINER
+           ================================================ */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ================================================
+           PROGRESS BAR
+           ================================================ */
+        .broken-progress {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #001f3f;
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        .step-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* ================================================
+           FORM ELEMENTS
+           ================================================ */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            transition: opacity 0.3s;
+        }
+        .swapped-input { font-family: 'Times New Roman', Times, serif; }
+        .required-marker { color: red; display: none; }
+
+        .global-error {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 15px;
+            border: 1px solid #cc0000;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            position: relative;
+        }
+
+        /* ================================================
+           PASSWORD LIVE RULES PANEL
+           ================================================ */
+        .pwd-rules-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 6px;
+            font-size: 11px;
+            line-height: 1.6;
+            position: relative;
+        }
+        .pwd-rule { transition: all 0.3s; }
+        .pwd-rule.pass { color: #28a745; }
+        .pwd-rule.fail { color: #dc3545; }
+        .pwd-rule.flicker { animation: ruleFlicker 0.5s ease 3; }
+        @keyframes ruleFlicker {
+            0%   { opacity: 1; }
+            50%  { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        /* ================================================
+           JUDGE ANNOTATIONS
+           ================================================ */
+        .judge-label {
+            position: absolute;
+            top: -12px;
+            right: 0;
+            font-size: 9px;
+            color: #888;
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+            pointer-events: none;
+            z-index: 5;
+            border: 1px solid #ccc;
+            white-space: nowrap;
+        }
+
+        /* ================================================
+           BUTTONS
+           ================================================ */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            position: relative;
+            min-height: 50px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: transform 0.2s, font-size 0.3s;
+        }
+        .btn-submit { background-color: #001f3f; color: white; z-index: 50; }
+        .btn-save { background-color: #e0e0e0; color: #333; }
+        .btn-cancel {
+            background-color: white;
+            color: #001f3f;
+            border: 1px solid #001f3f;
+            z-index: 50;
+        }
+
+        /* ================================================
+           MODALS (Chain of 4)
+           ================================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            width: 340px;
+            max-width: 90vw;
+            position: relative;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        /* ================================================
+           FAKE LOADING STATE
+           ================================================ */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 0;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #001f3f;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.5s linear infinite;
+        }
+        @keyframes spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text { margin-top: 20px; font-size: 16px; }
+
+        /* ================================================
+           TOAST NOTIFICATION
+           ================================================ */
+        #fake-toast {
+            position: fixed;
+            top: -60px;
+            right: 20px;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            z-index: 8000;
+            transition: top 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #fake-toast.show { top: 60px; }
+
+        /* ================================================
+           RAGE CLICK BANNER
+           ================================================ */
+        #rage-banner {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(200, 0, 0, 0.95);
+            color: white;
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 22px;
+            text-align: center;
+            padding: 20px;
+        }
+        #rage-banner p { margin: 8px 0; }
+
+        /* ================================================
+           HIREBOT CHAT BUBBLE
+           ================================================ */
+        #hirebot {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9000;
+        }
+        #hirebot-bubble {
+            background: #001f3f;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+            font-size: 13px;
+            max-width: 240px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            transition: transform 0.2s;
+            position: relative;
+        }
+        #hirebot-bubble:hover { transform: scale(1.03); }
+        .hirebot-avatar {
+            width: 36px;
+            height: 36px;
+            background: #0056b3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        /* ================================================
+           PASTE BLOCKED TOOLTIP
+           ================================================ */
+        .paste-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            display: none;
+            z-index: 100;
+        }
+
+        /* ================================================
+           FOOTER
+           ================================================ */
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        .easter-egg {
+            color: #f4f6f9;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .easter-egg:hover { color: #ccc; }
+
+        /* ================================================
+           RESPONSIVE
+           ================================================ */
+        @media (max-width: 640px) {
+            .container { margin: 20px 10px; padding: 20px; }
+            #violation-counter { font-size: 10px; padding: 6px 10px; top: 8px; right: 8px; }
+            .btn-group { flex-direction: column; }
+            .btn-group button { width: 100%; }
+            .session-timer { position: relative; top: auto; left: auto; text-align: center; margin-bottom: 5px; }
+            #hirebot-bubble { max-width: 180px; font-size: 12px; }
+            .judge-label { font-size: 7px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===================== VIOLATION COUNTER ===================== -->
+<div id="violation-counter">
+    <span class="judge-label" style="top:-18px; right:-5px;">[Live Violation Counter]</span>
+    ⚠️ UX Violations Triggered: <span id="v-count">0</span>
+</div>
+
+<!-- ===================== FAKE TOAST ===================== -->
+<div id="fake-toast">
+    <span class="judge-label" style="top:-16px;">[Violates: System Status — False Feedback]</span>
+    ✅ Draft auto-saved successfully!
+</div>
+
+<!-- ===================== RAGE CLICK BANNER ===================== -->
+<div id="rage-banner">
+    <span class="judge-label" style="top:10px; right:10px; color:#fff; background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.3);">[Violates: Error Prevention — False Security Theatre]</span>
+    <p style="font-size:40px; margin-bottom:0;">⚠️</p>
+    <p><strong>Suspicious activity detected.</strong></p>
+    <p style="font-size:16px;">Refreshing for your security…</p>
+</div>
+
+<!-- ===================== HEADER ===================== -->
+<header>
+    <div class="judge-label" style="top:5px; right:5px;">[Violates: Mental Models — Misdirected Nav]</div>
+    <div class="session-timer" id="session-timer">
+        <span class="judge-label" style="top:-16px; left:0; right:auto;">[Violates: System Status — False Urgency]</span>
+        ⏱ Session expires in: <span id="timer-display">10:00</span>
+    </div>
+    <h1>ApplyNow™️</h1>
+    <p class="tagline swapped-font-heading">Careers Made Simple</p>
+    <div class="powered-badge">Powered by AI™</div>
+    <nav>
+        <a id="nav-home" href="#contact" title="Read our documentation">Home</a>
+        <a id="nav-about" href="/404.html" title="Submit your resume">About Us</a>
+        <a id="nav-faq" href="mailto:nobody@example.com" title="Go back to the homepage">FAQ</a>
+    </nav>
+</header>
+
+<!-- ===================== MAIN FORM ===================== -->
+<div class="container" id="main-container">
+
+    <div class="loading-screen" id="loading-state">
+        <div class="judge-label">[Violates: System Status — Multi-Stage Fake Loading]</div>
+        <div class="spinner" id="spinner"></div>
+        <div class="loading-text" id="loading-text">Uploading your resume... (you didn't attach one)</div>
+    </div>
+
+    <div id="job-form-container">
+        <!-- Broken Progress -->
+        <div style="position:relative;">
+            <div class="judge-label">[Violates: System Status — Backwards Progress]</div>
+            <div class="broken-progress">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="step-label">Step 1 of 3</div>
+        </div>
+
+        <div class="global-error" id="global-error">
+            <div class="judge-label" style="top:2px;">[Violates: Error Recovery — Vague Message &amp; Data Loss]</div>
+            Something went wrong. Try again. Or don't.
+        </div>
+
+        <form id="job-form" autocomplete="off">
+
+            <!-- NAME -->
+            <div class="form-group">
+                <div class="judge-label">[Violates: Error Prevention — Invisible Reqs &amp; Autofill Sabotage]</div>
+                <label for="name" class="swapped-font">Full Legal Name <span class="required-marker">*</span></label>
+                <input type="text" id="name" title="Enter your 7-character password here" class="swapped-input" autocomplete="off">
+                <span class="paste-tooltip" id="paste-tip-name">Pasting is disabled for security reasons™</span>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label for="email">Email Address <span class="required-marker">*</span></label>
+                <input type="email" id="email" title="Select your country of origin" autocomplete="off">
+                <span class="paste-tooltip" id="paste-tip-email">Pasting is disabled for security reasons™</span>
+            </div>
+
+            <!-- COUNTRY -->
+            <div class="form-group">
+                <div class="judge-label">[Violates: Flexibility/Efficiency — Dropdown from Hell]</div>
+                <label for="country">Country of Residence <span class="required-marker">*</span></label>
+                <select id="country" class="swapped-input" title="Your full legal name"></select>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <div class="judge-label">[Violates: Consistency &amp; Standards — Moving Goalposts]</div>
+                <label for="password">Application Password <span class="required-marker">*</span></label>
+                <input type="password" id="password" title="Enter your primary email" autocomplete="off">
+                <span class="paste-tooltip" id="paste-tip-pwd">Pasting is disabled for security reasons™</span>
+                <div class="pwd-rules-panel" id="pwd-rules-panel">
+                    <div class="pwd-rule" id="rule-1">• Must be exactly 7 characters</div>
+                    <div class="pwd-rule" id="rule-2">• Must contain a Roman numeral (I, V, X, L, C, D, M)</div>
+                    <div class="pwd-rule" id="rule-3">• No repeated characters</div>
+                    <div class="pwd-rule" id="rule-4">• Cannot contain letters from your name</div>
+                </div>
+            </div>
+
+            <!-- RESUME UPLOAD (Fake) -->
+            <div class="form-group">
+                <div class="judge-label">[Violates: Error Prevention — Impossible File Requirements]</div>
+                <label for="resume" class="swapped-font">Upload Resume</label>
+                <input type="file" id="resume" accept=".doc" title="Enter your phone number">
+                <small style="color:#666; font-size:11px;">Accepted format: .doc (Microsoft Word 2003–2007 only)</small>
+                <div id="file-error" style="color:#cc0000; font-size:12px; margin-top:4px; display:none;"></div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="btn-group">
+                <div class="judge-label" style="top:-25px; left:0; right:auto;">[Violates: Fitts's Law — Unreachable Target &amp; Misleading Buttons]</div>
+                <button class="btn-cancel" id="btn-cancel" title="Permanently delete application">Cancel</button>
+                <button class="btn-save" id="btn-save" title="Submit your application">Save Draft</button>
+                <button class="btn-submit" id="btn-submit" title="Save your progress">Submit Application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===================== MODAL CHAIN (4 modals) ===================== -->
+<div class="modal" id="trap-modal-1">
+    <div class="modal-content">
+        <div class="judge-label">[Violates: User Control/Freedom — Infinite Confirmation Loop 1/4]</div>
+        <h3 class="swapped-font-heading">Wait!</h3>
+        <p>Are you sure you don't want to not unsubscribe from our daily partners' newsletter?</p>
+        <div class="modal-buttons">
+            <button class="btn-submit" id="trap-1-a">Confirm</button>
+            <button class="btn-cancel" id="trap-1-b">Also Confirm</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="trap-modal-2">
+    <div class="modal-content">
+        <div class="judge-label">[Violates: User Control/Freedom — Infinite Confirmation Loop 2/4]</div>
+        <h3 class="swapped-font-heading">Are you really sure?</h3>
+        <p>This action cannot be undone (probably).</p>
+        <div class="modal-buttons">
+            <button class="btn-submit" id="trap-2-a">Yes</button>
+            <button class="btn-cancel" id="trap-2-b">Yes but different</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="trap-modal-3">
+    <div class="modal-content">
+        <div class="judge-label">[Violates: User Control/Freedom — Infinite Confirmation Loop 3/4]</div>
+        <h3 class="swapped-font-heading">Last chance!</h3>
+        <p>Our lawyers require one more confirmation.</p>
+        <div class="modal-buttons">
+            <button class="btn-submit" id="trap-3-a">Fine</button>
+            <button class="btn-cancel" id="trap-3-b">Whatever</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="trap-modal-4">
+    <div class="modal-content">
+        <div class="judge-label">[Violates: User Control/Freedom — Infinite Confirmation Loop 4/4]</div>
+        <h3 class="swapped-font-heading">Thank you!</h3>
+        <p>You've been subscribed to <strong>17</strong> newsletters.</p>
+        <div class="modal-buttons" style="justify-content:center;">
+            <button class="btn-submit" id="trap-4-a">OK I give up</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== HIREBOT ===================== -->
+<div id="hirebot">
+    <div class="judge-label" style="top:-18px; left:0;">[Violates: User Control — False Automation Confidence]</div>
+    <div class="hirebot-avatar">🤖</div>
+    <div id="hirebot-bubble">Hi! I'm HireBot 🤖 Let me auto-fill your form!</div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+    <p id="footer-copyright">&copy; 2009 ApplyNow Inc. All rights reserved.</p>
+    <a href="#" class="easter-egg" id="easter-egg">Good UX Version</a>
+</footer>
+
+<!-- ===================== ALL JAVASCRIPT ===================== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ============================================================
+    // VIOLATION COUNTER — the Judge Showstopper
+    // ============================================================
+    let violationCount = 0;
+    const vCountEl = document.getElementById('v-count');
+    const vBadge = document.getElementById('violation-counter');
+
+    function triggerViolation() {
+        violationCount++;
+        vCountEl.textContent = violationCount;
+        vBadge.classList.remove('flash');
+        void vBadge.offsetWidth; // force reflow
+        vBadge.classList.add('flash');
+    }
+
+    // ============================================================
+    // 10. MISDIRECTED NAVIGATION (kept from v1)
+    // ============================================================
+    // Already set in HTML href attributes
+
+    // ============================================================
+    // 9. DROPDOWN FROM HELL (kept from v1)
+    // ============================================================
+    const rawCountries = ["Zimbabwe","Zambia","Yemen","Vietnam","Venezuela","Vanuatu","Uzbekistan","Uruguay","United States","United Kingdom","United Arab Emirates","Ukraine","Uganda","Tuvalu","Turkmenistan","Turkey","Tunisia","Trinidad and Tobago","Tonga","Togo","Timor-Leste","Thailand","Tanzania","Tajikistan","Taiwan","Syria","Switzerland","Sweden","Swaziland","Suriname","Sudan","Sri Lanka","Spain","South Sudan","South Africa","Somalia","Solomon Islands","Slovenia","Slovakia","Singapore","Sierra Leone","Seychelles","Serbia","Senegal","Saudi Arabia","Sao Tome and Principe","San Marino","Samoa","St. Vincent & Grenadines","St. Lucia","St. Kitts & Nevis","Rwanda","Russia","Romania","Qatar","Portugal","Poland","Philippines","Peru","Paraguay","Papua New Guinea","Panama","Palestine","Palau","Pakistan","Oman","Norway","North Korea","Nigeria","Niger","Nicaragua","New Zealand","Netherlands","Nepal","Nauru","Namibia","Myanmar","Mozambique","Morocco","Montenegro","Mongolia","Monaco","Moldova","Micronesia","Mexico","Mauritius","Mauritania","Marshall Islands","Malta","Mali","Maldives","Malaysia","Malawi","Madagascar","Macedonia","Luxembourg","Lithuania","Liechtenstein","Libya","Liberia","Lesotho","Lebanon","Latvia","Laos","Kyrgyzstan","Kuwait","Kosovo","Kiribati","Kenya","Kazakhstan","Jordan","Japan","Jamaica","Ivory Coast","Italy","Israel","Ireland","Iraq","Iran","Indonesia","India","Iceland","Hungary","Honduras","Haiti","Guyana","Guinea-Bissau","Guinea","Guatemala","Grenada","Greece","Ghana","Germany","Georgia","Gambia","Gabon","France","Finland","Fiji","Ethiopia","Estonia","Eritrea","Equatorial Guinea","El Salvador","Egypt","Ecuador","East Timor","Dominican Republic","Dominica","Djibouti","Denmark","Czech Republic","Cyprus","Cuba","Croatia","Costa Rica","Congo","Comoros","Colombia","China","Chile","Chad","Central African Republic","Cape Verde","Canada","Cameroon","Cambodia","Burundi","Burkina Faso","Bulgaria","Brunei","Brazil","Botswana","Bosnia & Herzegovina","Bolivia","Bhutan","Benin","Belize","Belgium","Belarus","Barbados","Bangladesh","Bahrain","Bahamas","Azerbaijan","Austria","Australia","Armenia","Argentina","Antigua & Barbuda","Angola","Andorra","Algeria","Albania","Afghanistan"];
+
+    const countrySelect = document.getElementById('country');
+    countrySelect.appendChild(new Option('-- Choose Carefully --', ''));
+    rawCountries.forEach(c => {
+        countrySelect.appendChild(new Option(c, c));
+        if (Math.random() > 0.6) countrySelect.appendChild(new Option(c + ' ', c));
+        if (Math.random() > 0.9) countrySelect.appendChild(new Option(c + ' (Republic of)', c));
+    });
+
+    // ============================================================
+    // 8. AUTO-FILL SABOTAGE (kept from v1 + triggers counter)
+    // ============================================================
+    const textInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
+    const inputTimeouts = new Map();
+
+    textInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            clearTimeout(inputTimeouts.get(input));
+            const timer = setTimeout(() => {
+                if (input.value.length > 0) {
+                    input.value = '';
+                    triggerViolation();
+                }
+            }, 5000);
+            inputTimeouts.set(input, timer);
+        });
+    });
+
+    // ============================================================
+    // 4. BROKEN PROGRESS BAR (kept from v1)
+    // ============================================================
+    const progressFill = document.getElementById('progress-fill');
+    const allInputs = document.querySelectorAll('#job-form input:not([type="file"]), #job-form select');
+
+    const updateProgress = () => {
+        let filledCount = 0;
+        allInputs.forEach(i => { if (i.value && i.value.trim() !== '') filledCount++; });
+        let percent = 100 - (filledCount / allInputs.length) * 100;
+        progressFill.style.width = Math.max(0, percent) + '%';
+    };
+    allInputs.forEach(i => {
+        i.addEventListener('input', updateProgress);
+        i.addEventListener('change', updateProgress);
+    });
+
+    // ============================================================
+    // NEW 3. TELEPORTING SUBMIT BUTTON (upgraded from v1 drift)
+    // ============================================================
+    const realSubmitBtn = document.getElementById('btn-cancel'); // "Cancel" is real submit
+    const fakeSubmitBtn = document.getElementById('btn-submit'); // "Submit" clears form
+    let cancelHoverCount = 0;
+
+    realSubmitBtn.addEventListener('mouseenter', () => {
+        cancelHoverCount++;
+        triggerViolation();
+
+        if (cancelHoverCount >= 5) {
+            // shrink & hide behind footer
+            realSubmitBtn.style.position = 'fixed';
+            realSubmitBtn.style.bottom = '5px';
+            realSubmitBtn.style.left = '50%';
+            realSubmitBtn.style.transform = 'translateX(-50%)';
+            realSubmitBtn.style.fontSize = '8px';
+            realSubmitBtn.style.padding = '3px 6px';
+            realSubmitBtn.style.opacity = '0.3';
+            realSubmitBtn.style.zIndex = '1';
+        } else if (cancelHoverCount >= 3) {
+            // teleport to random viewport corner
+            const positions = [
+                { top: '20px', left: '20px', bottom: 'auto', right: 'auto' },
+                { top: '20px', left: 'auto', bottom: 'auto', right: '20px' },
+                { top: 'auto', left: '20px', bottom: '80px', right: 'auto' },
+                { top: 'auto', left: 'auto', bottom: '80px', right: '80px' },
+            ];
+            const pos = positions[Math.floor(Math.random() * positions.length)];
+            realSubmitBtn.style.position = 'fixed';
+            realSubmitBtn.style.top = pos.top;
+            realSubmitBtn.style.left = pos.left;
+            realSubmitBtn.style.bottom = pos.bottom;
+            realSubmitBtn.style.right = pos.right;
+            realSubmitBtn.style.transform = 'none';
+        } else {
+            // mild drift (original behavior)
+            const moveX = (Math.random() - 0.5) * 80;
+            const moveY = (Math.random() - 0.5) * 80;
+            realSubmitBtn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        }
+    });
+
+    // ============================================================
+    // 1 & 2. MISLEADING BUTTONS & DESTRUCTIVE FORM (kept from v1)
+    // ============================================================
+    function showFormError(msg) {
+        const errorEl = document.getElementById('global-error');
+        errorEl.innerHTML = `<div class="judge-label" style="top:-10px; right:0;">[Violates: Error Recovery — Vague Message &amp; Data Loss]</div>${msg}`;
+        errorEl.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function revealRequiredMarkers() {
+        document.querySelectorAll('.required-marker').forEach(el => el.style.display = 'inline');
+    }
+
+    // "Submit Application" clears form (fake)
+    fakeSubmitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('job-form').reset();
+        revealRequiredMarkers();
+        updateProgress();
+        showFormError("Something went wrong. Try again. Or don't.");
+        triggerViolation();
+    });
+
+    // "Save Draft" opens trap modal chain
+    document.getElementById('btn-save').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('trap-modal-1').style.display = 'flex';
+        triggerViolation();
+    });
+
+    // ============================================================
+    // NEW 9. INFINITE MODAL LOOP (upgrade from v1 single modal)
+    // ============================================================
+    function chainModal(closeSel, openSel) {
+        document.querySelectorAll(closeSel).forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('.modal').style.display = 'none';
+                triggerViolation();
+                if (openSel) {
+                    document.querySelector(openSel).style.display = 'flex';
+                } else {
+                    showFormError("You have successfully subscribed to 17 newsletters.");
+                }
+            });
+        });
+    }
+    chainModal('#trap-1-a, #trap-1-b', '#trap-modal-2');
+    chainModal('#trap-2-a, #trap-2-b', '#trap-modal-3');
+    chainModal('#trap-3-a, #trap-3-b', '#trap-modal-4');
+    chainModal('#trap-4-a', null);
+
+    // ============================================================
+    // 3. IMPOSSIBLE PASSWORD RULES & ACTUAL SUBMISSION (kept from v1)
+    // ============================================================
+    realSubmitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pwd = document.getElementById('password').value;
+        const name = document.getElementById('name').value.toLowerCase();
+
+        let validPwd = true;
+        if (pwd.length !== 7) validPwd = false;
+        if (!/[IVXLCDM]/i.test(pwd)) validPwd = false;
+        if (/(.).*\1/.test(pwd)) validPwd = false;
+        if (name) {
+            for (let char of pwd.toLowerCase()) {
+                if (name.includes(char) && /[a-z]/.test(char)) validPwd = false;
+            }
+        }
+
+        revealRequiredMarkers();
+
+        if (!validPwd) {
+            document.getElementById('job-form').reset();
+            updateProgress();
+            showFormError("Validation failed. Form has been reset for your convenience.");
+            triggerViolation();
+            return;
+        }
+
+        // ============================================================
+        // NEW 11. MULTI-STAGE FAKE LOADING
+        // ============================================================
+        document.getElementById('job-form-container').style.display = 'none';
+        const loadingScreen = document.getElementById('loading-state');
+        loadingScreen.style.display = 'flex';
+        triggerViolation();
+
+        const loadingSteps = [
+            { t: 0,     msg: "Uploading your resume... (you didn't attach one)" },
+            { t: 2000,  msg: "Contacting HR Department..." },
+            { t: 4000,  msg: "Waking up the hiring manager..." },
+            { t: 6000,  msg: "Verifying your Roman numeral..." },
+            { t: 8000,  msg: "Almost there! 94% complete." },
+            { t: 10000, msg: "Application 94% submitted. Complete the remaining 6% by calling our office between 2–2:15pm on alternate Tuesdays.", hideSpinner: true },
+        ];
+
+        loadingSteps.forEach(step => {
+            setTimeout(() => {
+                document.getElementById('loading-text').innerText = step.msg;
+                if (step.hideSpinner) {
+                    document.getElementById('spinner').style.display = 'none';
+                }
+            }, step.t);
+        });
+    });
+
+    // ============================================================
+    // NEW 4. CONTRADICTING LIVE PASSWORD RULES
+    // ============================================================
+    const pwdInput = document.getElementById('password');
+    const rule1 = document.getElementById('rule-1');
+    const rule2 = document.getElementById('rule-2');
+    const rule3 = document.getElementById('rule-3');
+    const rule4 = document.getElementById('rule-4');
+
+    pwdInput.addEventListener('input', () => {
+        const val = pwdInput.value;
+        triggerViolation();
+
+        // Rule 1 — length contradiction
+        if (val.length === 0) {
+            rule1.textContent = '• Must be exactly 7 characters';
+            rule1.className = 'pwd-rule';
+        } else if (val.length < 7) {
+            rule1.textContent = '• Must be at least 8 characters';
+            rule1.className = 'pwd-rule fail';
+        } else if (val.length === 7) {
+            rule1.textContent = '• Password is too predictable. Try being more random.';
+            rule1.className = 'pwd-rule fail flicker';
+        } else {
+            rule1.textContent = '• Must be exactly 7 characters (8 is too corporate)';
+            rule1.className = 'pwd-rule fail';
+        }
+
+        // Rule 2 — number/roman contradiction
+        if (/[0-9]/.test(val)) {
+            rule2.textContent = '• Numbers are not allowed (use Roman numerals only)';
+            rule2.className = 'pwd-rule fail';
+        } else if (/[IVXLCDM]/i.test(val)) {
+            rule2.textContent = '• Contains Roman numeral ✓ ... wait, did we require that?';
+            rule2.className = 'pwd-rule flicker';
+        } else {
+            rule2.textContent = '• Must contain a Roman numeral (I, V, X, L, C, D, M)';
+            rule2.className = 'pwd-rule fail';
+        }
+
+        // Rule 3 — case contradiction
+        if (/[A-Z]/.test(val)) {
+            rule3.textContent = '• Must be all lowercase';
+            rule3.className = 'pwd-rule fail';
+            setTimeout(() => {
+                rule3.textContent = '• Must contain at least one uppercase letter ✓';
+                rule3.className = 'pwd-rule pass flicker';
+            }, 1200);
+        } else {
+            rule3.textContent = '• No repeated characters';
+            rule3.className = 'pwd-rule';
+        }
+
+        // Rule 4 — name check
+        const nameVal = document.getElementById('name').value.toLowerCase();
+        if (nameVal.length > 0) {
+            rule4.textContent = '• Cannot contain letters from your name (we know your name... somehow)';
+            rule4.className = 'pwd-rule fail';
+        } else {
+            rule4.textContent = '• Cannot contain letters from your name (which we don\'t know yet)';
+            rule4.className = 'pwd-rule';
+        }
+    });
+
+    // ============================================================
+    // NEW 12. RESUME UPLOAD (FAKE)
+    // ============================================================
+    const resumeInput = document.getElementById('resume');
+    const fileError = document.getElementById('file-error');
+
+    resumeInput.addEventListener('change', () => {
+        triggerViolation();
+        const file = resumeInput.files[0];
+        if (!file) return;
+
+        fileError.style.display = 'block';
+
+        if (!file.name.endsWith('.doc')) {
+            fileError.textContent = 'Error: Only .doc files from Microsoft Word 2003–2007 are accepted. PDF is not a real format.';
+        } else {
+            fileError.textContent = 'Error: File too large. Maximum size is 2KB. Please compress your career into fewer words.';
+        }
+        // Clear the input so they can try again and fail again
+        resumeInput.value = '';
+    });
+
+    // ============================================================
+    // NEW 2. HIREBOT — Fake AI Autofill
+    // ============================================================
+    const hirebotBubble = document.getElementById('hirebot-bubble');
+    let hirebotClicked = false;
+
+    hirebotBubble.addEventListener('click', () => {
+        if (hirebotClicked) {
+            hirebotBubble.textContent = "I already helped you! What more do you want? 😤";
+            triggerViolation();
+            return;
+        }
+        hirebotClicked = true;
+        triggerViolation();
+
+        // Fill everything wrong
+        document.getElementById('name').value = 'NULL_POINTER_EXCEPTION';
+        document.getElementById('email').value = 'definitely_not_a_real_email';
+        // Select Zimbabwe
+        const cs = document.getElementById('country');
+        cs.value = 'Zimbabwe';
+        document.getElementById('password').value = 'abc123';
+
+        updateProgress();
+        hirebotBubble.textContent = "Done! I've filled everything perfectly. Good luck! 😊";
+    });
+
+    // ============================================================
+    // NEW 5. FAKE "DRAFT SAVED" TOAST
+    // ============================================================
+    const fakeToast = document.getElementById('fake-toast');
+    setInterval(() => {
+        fakeToast.classList.add('show');
+        triggerViolation();
+        setTimeout(() => { fakeToast.classList.remove('show'); }, 3000);
+    }, 12000);
+
+    // ============================================================
+    // NEW 6. SCROLL HIJACK
+    // ============================================================
+    setInterval(() => {
+        if (window.scrollY > 50) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            triggerViolation();
+        }
+    }, 20000);
+
+    // ============================================================
+    // NEW 7. RAGE CLICK DETECTOR
+    // ============================================================
+    let clickTimestamps = [];
+    const rageBanner = document.getElementById('rage-banner');
+
+    document.addEventListener('click', () => {
+        const now = Date.now();
+        clickTimestamps.push(now);
+        // Keep only clicks from last 2 seconds
+        clickTimestamps = clickTimestamps.filter(t => now - t < 2000);
+
+        if (clickTimestamps.length >= 3) {
+            clickTimestamps = [];
+            rageBanner.style.display = 'flex';
+            triggerViolation();
+            setTimeout(() => { rageBanner.style.display = 'none'; }, 3000);
+        }
+    });
+
+    // ============================================================
+    // NEW 8. PASTE BLOCKER + COPY DISABLE
+    // ============================================================
+    textInputs.forEach(input => {
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            triggerViolation();
+            // Show tooltip
+            const tip = input.parentElement.querySelector('.paste-tooltip');
+            if (tip) {
+                tip.style.display = 'block';
+                setTimeout(() => { tip.style.display = 'none'; }, 2000);
+            }
+        });
+    });
+
+    // Disable copy/select on password
+    pwdInput.addEventListener('copy', e => e.preventDefault());
+    pwdInput.addEventListener('selectstart', e => e.preventDefault());
+    pwdInput.style.userSelect = 'none';
+    pwdInput.style.webkitUserSelect = 'none';
+
+    // ============================================================
+    // NEW 10. FAKE SESSION TIMER
+    // ============================================================
+    const timerDisplay = document.getElementById('timer-display');
+    let timerSeconds = 600; // 10 minutes
+
+    setInterval(() => {
+        timerSeconds--;
+        if (timerSeconds <= 0) timerSeconds = 600; // silently reset
+
+        const mins = Math.floor(timerSeconds / 60);
+        const secs = timerSeconds % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        // Flash red at low time for extra anxiety
+        if (timerSeconds < 30) {
+            timerDisplay.style.color = '#ff0000';
+            timerDisplay.style.fontWeight = 'bold';
+        } else {
+            timerDisplay.style.color = '';
+            timerDisplay.style.fontWeight = '';
+        }
+    }, 1000);
+
+    // ============================================================
+    // BROWSER TAB TITLE CYCLING
+    // ============================================================
+    const titles = [
+        "ApplyNow™️ — Careers Made Simple",
+        "(1) New Message from HR!",
+        "⚠️ Your session is expiring!",
+        "Thanks for applying! (just kidding)",
+    ];
+    let titleIdx = 0;
+    setInterval(() => {
+        titleIdx = (titleIdx + 1) % titles.length;
+        document.title = titles[titleIdx];
+    }, 5000);
+
+    // ============================================================
+    // RANDOM FOOTER COPYRIGHT YEAR
+    // ============================================================
+    const years = ['2009', '1997', '2031'];
+    document.getElementById('footer-copyright').innerHTML =
+        `&copy; ${years[Math.floor(Math.random() * years.length)]} ApplyNow Inc. All rights reserved.`;
+
+    // ============================================================
+    // EASTER EGG (kept from v1)
+    // ============================================================
+    document.getElementById('easter-egg').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("Haha. That doesn't exist here.");
+    });
+
+});
+</script>
+
+</body>
+</html>
